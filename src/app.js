@@ -1,13 +1,5 @@
 function formatDate(timestamp) {
   let date = new Date(timestamp);
-  let hours = date.getHours();
-  if (hours < 10) {
-    hours = `0${hours}`;
-  }
-  let minutes = date.getMinutes();
-  if (minutes < 10) {
-    minutes = `0${minutes}`;
-  }
 
   let days = [
     "Sunday",
@@ -19,14 +11,8 @@ function formatDate(timestamp) {
     "Saturday",
   ];
   let day = days[date.getDay()];
-  return `${day} ${hours}:${minutes}`;
-}
-function formatDay(timestamp) {
-  let date = new Date(timestamp * 1000);
-  let day = date.getDay();
-  let days = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 
-  return days[day];
+  return `${day}`;
 }
 
 function displayForecast(response) {
@@ -35,17 +21,21 @@ function displayForecast(response) {
   let forecastElement = document.querySelector("#forecast");
 
   let forecastHTML = `<div class="row">`;
-  forecast.forEach(function (forecastDay) {
-    forecastHTML += `<div class="col-3">
+  forecast.forEach(function (forecastDay, index) {
+    if (index < 4) {
+      forecastHTML += `<div class="col-3">
         <div class="weather-forecast">
-          <div class="days alignment">${forecastDay.dt}</div>
-          <img src="http://openweathermap.org/img/wn/${forecastDay.weather[0].icon}@2x.png"/>
+          <div class="days alignment">${formatDate(forecastDay.dt * 1000)}</div>
+          <img src="http://openweathermap.org/img/wn/${
+            forecastDay.weather[0].icon
+          }@2x.png"/>
           <div class="temperatures ocean alignment">
             <span class="tempMax">${forecastDay.temp.max}°</span> /
             <span class="tempMIN">${forecastDay.temp.min}°</span>
           </div>
         </div>
       </div>`;
+    }
   });
 
   forecastHTML += `</div>`;
@@ -70,7 +60,6 @@ function displayTemperature(response) {
   let iconElement = document.querySelector("#icon");
 
   let celsiusTemperature = response.data.main.temp;
-
   temperatureElement.innerHTML = Math.round(celsiusTemperature);
   cityElement.innerHTML = response.data.name;
   descriptionElement.innerHTML = response.data.weather[0].description;
@@ -82,6 +71,7 @@ function displayTemperature(response) {
     `http://openweathermap.org/img/wn/${response.data.weather[0].icon}@2x.png`
   );
   iconElement.setAttribute("alt", response.data.weather[0].description);
+  getForecast(response.data.coord);
 }
 
 function search(city) {
